@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>CP Store — Call of Duty: Mobile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +25,7 @@
   --grn:#22c55e;
   --red:#ef4444;
   --amb:#f59e0b;
+  --yel:#fbbf24;
   --r:14px;
   --disp:'Barlow Condensed',system-ui,sans-serif;
   --ui:'Rajdhani',system-ui,sans-serif;
@@ -32,7 +33,12 @@
   --ease:cubic-bezier(.22,1,.36,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+  touch-action:pan-x pan-y;          /* blocks pinch-zoom */
+  -webkit-tap-highlight-color:transparent;
+}
 body{
   background:var(--bg);color:var(--txt);
   font-family:var(--ui);font-weight:500;
@@ -47,7 +53,15 @@ body::before{
 }
 body.he{font-family:var(--he)}
 body.he .disp{font-family:var(--he);font-weight:900;letter-spacing:0}
-img{max-width:100%;display:block}
+img{
+  max-width:100%;display:block;
+  pointer-events:none;                /* not clickable / no long-press menu */
+  user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none;         /* iOS save-image sheet off */
+  -webkit-user-drag:none;user-drag:none;
+}
+/* iOS zooms any input under 16px on focus — keep all inputs at 16px */
+input,select,textarea{font-size:16px}
 button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
 input{font-family:inherit}
 :focus-visible{outline:2px solid var(--pur-2);outline-offset:3px;border-radius:6px}
@@ -147,6 +161,18 @@ body.he .gate-lb{letter-spacing:0;text-transform:none;font-size:13.5px}
 }
 .gate-msg.err{color:var(--red)}
 .gate-msg.load{color:var(--txt-dim)}
+/* real rotating spinner (SVG element, not a background) */
+.spin-sm{
+  width:15px;height:15px;flex:none;display:block;
+  animation:rot .75s linear infinite;transform-origin:50% 50%;
+}
+.gate-fld{position:relative;flex:1;min-width:0;display:flex}
+.gate-busy{
+  position:absolute;top:50%;inset-inline-end:14px;
+  width:20px;height:20px;margin-top:-10px;
+  animation:rot .75s linear infinite;transform-origin:50% 50%;
+  pointer-events:none;
+}
 
 /* ---- PLAYER CARD ---- */
 .pcard{
@@ -160,8 +186,9 @@ body.he .gate-lb{letter-spacing:0;text-transform:none;font-size:13.5px}
 .pav{
   width:52px;height:52px;flex:none;border-radius:12px;
   background:linear-gradient(135deg,var(--pur-deep),var(--pur));
-  display:grid;place-items:center;position:relative;
+  display:grid;place-items:center;position:relative;overflow:hidden;
 }
+.pav img{width:100%;height:100%;object-fit:cover;border-radius:12px}
 .pav::after{
   content:'';position:absolute;inset:-3px;border-radius:15px;
   border:1.5px solid rgba(168,85,247,.4);animation:pulseRing 2.4s ease-in-out infinite;
@@ -222,7 +249,7 @@ body.he .sec-hd .ln{background:linear-gradient(270deg,var(--line-2),transparent)
   border-color:rgba(168,85,247,.5);transform:translateY(-5px);
   box-shadow:0 16px 44px -14px rgba(168,85,247,.4);
 }
-.card:hover .card-img img{transform:scale(1.12) translateY(-4px)}
+.card:hover .card-img img{transform:scale(1.10) translateY(-6px)}
 .card.sel{border-color:var(--pur);box-shadow:0 0 0 1px var(--pur),0 16px 44px -14px rgba(168,85,247,.55)}
 .card.locked{opacity:.5}
 .card.deny{animation:shake .42s}
@@ -245,21 +272,22 @@ body.he .tag{letter-spacing:0;text-transform:none;font-size:11.5px}
   font-size:14px;font-weight:600;color:var(--pur-2);
   vertical-align:baseline;margin-inline-start:4px;letter-spacing:.09em;
 }
-.card-img{height:112px;display:grid;place-items:center;margin:12px 0 4px;position:relative;z-index:1}
+.card-img{height:104px;display:grid;place-items:center;margin:8px 0 26px;position:relative;z-index:1;overflow:visible}
 .card-img img{
   max-height:100%;width:auto;object-fit:contain;
-  filter:drop-shadow(0 10px 22px rgba(168,85,247,.42));
+  filter:drop-shadow(0 6px 16px rgba(168,85,247,.38));
   transition:transform .4s var(--ease);
   animation:float 4s ease-in-out infinite;
 }
-@keyframes float{0%,100%{translate:0 0}50%{translate:0 -7px}}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -6px}}
 .card:nth-child(2n) .card-img img{animation-delay:-1.1s}
 .card:nth-child(3n) .card-img img{animation-delay:-2.2s}
 
 .spec{
-  position:relative;z-index:1;
-  border-top:1px solid var(--line);margin-top:12px;padding-top:12px;
+  position:relative;z-index:3;
+  border-top:1px solid var(--line);margin-top:0;padding-top:14px;
   display:flex;flex-direction:column;gap:5px;
+  background:transparent;
 }
 .spec-1{font-size:16px;font-weight:700;letter-spacing:.02em;direction:ltr}
 .spec-1 .base{color:var(--txt)}
@@ -276,8 +304,8 @@ body.he .spec-2{letter-spacing:0;text-transform:none;font-size:13px}
   margin-top:14px;padding-top:13px;border-top:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;gap:10px;
 }
-.price{font-family:var(--disp);font-size:25px;font-weight:700;letter-spacing:.01em;direction:ltr}
-.price .cur{font-size:16px;color:var(--txt-dim);margin-inline-start:2px}
+.price{font-family:var(--disp);font-size:25px;font-weight:700;letter-spacing:.01em;direction:ltr;color:var(--yel)}
+.price .cur{font-size:16px;color:var(--yel);margin-inline-start:2px}
 .pick{
   display:flex;align-items:center;gap:6px;
   border:1px solid var(--line-2);border-radius:9px;
@@ -312,7 +340,7 @@ body.he .pick{letter-spacing:0;text-transform:none;font-size:13.5px}
 .dr-tot{text-align:end;flex:none}
 .dr-tot small{display:block;font-size:10px;color:var(--txt-mute);letter-spacing:.13em;text-transform:uppercase;font-weight:700}
 body.he .dr-tot small{letter-spacing:0;text-transform:none;font-size:11.5px}
-.dr-tot b{display:block;font-family:var(--disp);font-size:27px;font-weight:700;line-height:1.1;direction:ltr}
+.dr-tot b{display:block;font-family:var(--disp);font-size:27px;font-weight:700;line-height:1.1;direction:ltr;color:var(--yel)}
 .btn-pay{
   flex:none;display:flex;align-items:center;gap:9px;
   background:linear-gradient(135deg,var(--pur),var(--pur-deep));
@@ -360,7 +388,7 @@ body.he .md-hd h3{font-family:var(--he);font-weight:900;letter-spacing:0;text-tr
 .sum-l{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13.5px;padding:5px 0;color:var(--txt-dim);font-weight:600}
 .sum-l b{color:var(--txt);font-weight:700;direction:ltr}
 .sum-l.tot{border-top:1px solid var(--line);margin-top:8px;padding-top:11px;font-size:16px;color:var(--txt)}
-.sum-l.tot b{font-family:var(--disp);font-size:24px;color:var(--pur-2)}
+.sum-l.tot b{font-family:var(--disp);font-size:24px;color:var(--yel)}
 
 .fl{margin-bottom:13px}
 .fl label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-dim);margin-bottom:6px}
@@ -527,14 +555,14 @@ body.he .rcp-top h2{font-family:var(--he);font-weight:900;letter-spacing:0;text-
 .rcp-item-tx{flex:1;min-width:0}
 .rcp-item-tx b{display:block;font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.02em;line-height:1.2}
 .rcp-item-tx small{display:block;font-size:11.5px;color:var(--txt-mute);margin-top:2px;direction:ltr;font-weight:600}
-.rcp-item-pr{font-family:var(--disp);font-size:19px;font-weight:700;flex:none;direction:ltr}
+.rcp-item-pr{font-family:var(--disp);font-size:19px;font-weight:700;flex:none;direction:ltr;color:var(--yel)}
 .rcp-meta{border-top:1px solid var(--line);margin-top:14px;padding-top:16px;display:flex;flex-direction:column;gap:9px}
 .rcp-mr{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;font-weight:600}
 .rcp-mr span{color:var(--txt-mute)}
 .rcp-mr b{color:var(--txt-dim);font-weight:700;direction:ltr;text-align:end;word-break:break-all}
 .rcp-mr.grand{border-top:1px solid var(--line);margin-top:6px;padding-top:14px;font-size:16px}
 .rcp-mr.grand span{color:var(--txt);font-weight:700}
-.rcp-mr.grand b{font-family:var(--disp);font-size:26px;color:var(--pur-2)}
+.rcp-mr.grand b{font-family:var(--disp);font-size:26px;color:var(--yel)}
 .rcp-note{
   margin-top:18px;padding:13px;border-radius:11px;
   background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.28);
@@ -582,7 +610,7 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
   .grid{grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
   .card{padding:16px 12px 15px}
   .card h1{font-size:25px}
-  .card-img{height:82px}
+  .card-img{height:76px;margin:6px 0 20px}
   .spec-1{font-size:14px}
   .spec-2{font-size:11px}
   .price{font-size:20px}
@@ -650,8 +678,11 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
       <span data-i="gateLb">Enter your COD:M account ID</span>
     </div>
     <div class="gate-row">
-      <input class="gate-in" id="acc" type="text" inputmode="numeric" autocomplete="off" spellcheck="false"
-             placeholder="e.g. 7603701744251371521" maxlength="24" aria-label="Account ID">
+      <div class="gate-fld">
+        <input class="gate-in" id="acc" type="text" inputmode="numeric" autocomplete="off" spellcheck="false"
+               placeholder="Enter ID" maxlength="24" aria-label="Player ID">
+        <svg class="gate-busy" id="accSpin" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.6" stroke-linecap="round" hidden><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+      </div>
       <button class="gate-btn" id="accBtn" disabled>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <span data-i="verify">VERIFY</span>
@@ -742,6 +773,23 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
       <button class="md-x" id="payX" aria-label="Close">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
+    </div>
+
+    <!-- STEP: LOADING CHECKOUT -->
+    <div id="stepLoad" hidden>
+      <div class="proc">
+        <div class="spin">
+          <svg viewBox="0 0 100 100">
+            <circle class="ring" cx="50" cy="50" r="44"/>
+            <circle class="arc" cx="50" cy="50" r="44"/>
+          </svg>
+          <div class="spin-ic">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+        </div>
+        <h4 data-i="loadT">Loading secure checkout</h4>
+        <p data-i="loadP">Establishing encrypted connection…</p>
+      </div>
     </div>
 
     <!-- STEP: FORM -->
@@ -875,21 +923,24 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
 /* ================= DATA ================= */
 var IMG = 'https://i.postimg.cc/qvPZDC3g/IMG-1456-removebg-preview.png';
 
+/* ils = price shown in Hebrew (₪) · inr = price shown in English (₹) */
 var PACKS = [
-  {cp:88,    base:80,    bonus:8,     pct:10, price:2.90},
-  {cp:460,   base:400,   bonus:60,    pct:15, price:14.90},
-  {cp:960,   base:800,   bonus:160,   pct:20, price:29.90},
-  {cp:2600,  base:2000,  bonus:600,   pct:30, price:67.90, tag:'pop'},
-  {cp:5400,  base:4000,  bonus:1400,  pct:35, price:129.90},
-  {cp:11600, base:8000,  bonus:3600,  pct:45, price:269.90},
-  {cp:23200, base:16000, bonus:7200,  pct:45, price:589.90},
-  {cp:34800, base:24000, bonus:10800, pct:45, price:899.90},
-  {cp:58000, base:40000, bonus:18000, pct:45, price:1379.90, tag:'best'}
+  {cp:88,    base:80,    bonus:8,     pct:10, ils:2.90,    inr:92},
+  {cp:460,   base:400,   bonus:60,    pct:15, ils:14.90,   inr:469},
+  {cp:960,   base:800,   bonus:160,   pct:20, ils:29.90,   inr:889},
+  {cp:2600,  base:2000,  bonus:600,   pct:30, ils:67.90,   inr:2069, tag:'pop'},
+  {cp:5400,  base:4000,  bonus:1400,  pct:35, ils:129.90,  inr:3899},
+  {cp:11600, base:8000,  bonus:3600,  pct:45, ils:269.90,  inr:8399},
+  {cp:23200, base:16000, bonus:7200,  pct:45, ils:589.90,  inr:18129},
+  {cp:34800, base:24000, bonus:10800, pct:45, ils:899.90,  inr:28111},
+  {cp:58000, base:40000, bonus:18000, pct:45, ils:1379.90, inr:43222, tag:'best'}
 ];
 
 var ACCOUNTS = {
-  '7603701744251371521':{name:'PROnatan0511', pid:'***EMW', lvl:182, rank:'Grand Master II'},
-  '7610431203465691137':{name:'prokuti',      pid:'***6S2', lvl:165, rank:'Grand Master II'}
+  '7603701744251371521':{name:'PROnatan0511', pid:'***EMW', lvl:182, rank:'Grand Master II',
+    av:'https://i.postimg.cc/bYR53Jgn/IMG-1463.png'},
+  '7610431203465691137':{name:'prokuti',      pid:'***6S2', lvl:165, rank:'Grand Master II',
+    av:'https://i.postimg.cc/23R31wtc/IMG-1462.png'}
 };
 
 /* ================= I18N ================= */
@@ -906,6 +957,8 @@ var T = {
     sumPack:'Package', sumQty:'Quantity', sumAcc:'Account',
     fCard:'Card number', fName:'Name on card', fExp:'Expiry', fCvv:'CVV',
     hintOk:'Approved:', hintNo:'Declined:', payNow:'Pay now',
+    loadT:'Loading secure checkout', loadP:'Establishing encrypted connection…',
+    accPh:'Enter ID',
     procT:'Processing payment',
     failT:'Transaction declined',
     failP:'The card was declined by the issuer. Try a different card or contact your bank.',
@@ -935,13 +988,15 @@ var T = {
     brandSub:'Call of Duty: Mobile',
     heroT:'טעינת <em>CP</em> מיידית לחשבון',
     heroP:'הזינו את מספר החשבון, בחרו חבילה, וה-CP נטענים ישירות לחשבון שלכם.',
-    gateLb:'הזינו את מספר חשבון ה-COD:M שלכם', verify:'אימות',
+    gateLb:'הזן מזהה שחקן', verify:'אימות',
     packs:'חבילות CP', max3:'עד 3', total:'סה״כ', checkout:'מעבר לתשלום',
     payTitle:'תשלום',
     payWarn:'זו הדגמה בלבד. לא מתבצע תשלום ולא מחויב שום סכום. אין להזין מספר כרטיס אמיתי — השתמשו בכרטיסי הבדיקה למטה.',
     sumPack:'חבילה', sumQty:'כמות', sumAcc:'חשבון',
     fCard:'מספר כרטיס', fName:'שם בעל הכרטיס', fExp:'תוקף', fCvv:'CVV',
     hintOk:'מאושר:', hintNo:'נדחה:', payNow:'שלם עכשיו',
+    loadT:'טוען עמוד תשלום מאובטח', loadP:'מוציב חיבור מוצפן…',
+    accPh:'הזן מזהה שחקן',
     procT:'מעבד תשלום',
     failT:'העסקה נדחתה',
     failP:'הכרטיס נדחה על ידי חברת האשראי. נסו כרטיס אחר או פנו לבנק.',
@@ -971,12 +1026,26 @@ var lang = 'en';
 function t(k){ return T[lang][k]; }
 
 /* ================= STATE ================= */
-var S = { acc:null, player:null, pack:null, qty:1, lastOrder:null };
+var S = { acc:null, player:null, pack:null, qty:1, lastOrder:null, loadTimer:null };
 
 /* ================= HELPERS ================= */
 var $ = function(id){ return document.getElementById(id); };
 function nf(n){ return n.toLocaleString('en-US'); }
-function money(n){ return '₪' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+/* Hebrew -> ILS (₪, 2 decimals) · English -> INR (₹, whole numbers) */
+function priceOf(p){ return (lang === 'he') ? p.ils : p.inr; }
+function money(n){
+  if(lang === 'he'){
+    return '₪' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  return '₹' + n.toLocaleString('en-US',{maximumFractionDigits:0});
+}
+function priceParts(p){
+  var v = priceOf(p);
+  if(lang === 'he'){
+    return {num: v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}), sym:'₪'};
+  }
+  return {num: v.toLocaleString('en-US',{maximumFractionDigits:0}), sym:'₹'};
+}
 
 /* ================= RENDER GRID ================= */
 function renderGrid(){
@@ -989,6 +1058,7 @@ function renderGrid(){
     } else if(p.tag === 'pop'){
       tag = '<div class="tag pop"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>'+t('tagPop')+'</div>';
     }
+    var pp = priceParts(p);
     var el = document.createElement('article');
     el.className = 'card';
     el.style.setProperty('--glow', glow);
@@ -1000,11 +1070,11 @@ function renderGrid(){
       '<h1 class="tnum">'+nf(p.cp)+'<sub>CP</sub></h1>' +
       '<div class="card-img"><img src="'+IMG+'" alt="'+nf(p.cp)+' CP" loading="lazy"></div>' +
       '<div class="spec">' +
-        '<div class="spec-1 tnum"><span class="base">'+nf(p.base)+'</span><span class="op">+</span><span class="bon">'+nf(p.bonus)+' B</span></div>' +
+        '<div class="spec-1 tnum"><span class="base">'+nf(p.base)+'</span><span class="op">+</span><span class="bon">'+nf(p.bonus)+'</span></div>' +
         '<div class="spec-2">'+p.pct+'% '+t('webBonus')+'</div>' +
       '</div>' +
       '<div class="price-row">' +
-        '<div class="price tnum">'+p.price.toFixed(2)+'<span class="cur">₪</span></div>' +
+        '<div class="price tnum">'+pp.num+'<span class="cur">'+pp.sym+'</span></div>' +
         '<div class="pick">' +
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
           t('select') +
@@ -1050,11 +1120,11 @@ function updateDrawer(){
   var p = S.pack;
   $('drImg').src = IMG;
   $('drName').textContent = nf(p.cp) + ' CP';
-  $('drSpec').textContent = nf(p.base) + ' + ' + nf(p.bonus) + ' B · ' + p.pct + '%';
+  $('drSpec').textContent = nf(p.base) + ' + ' + nf(p.bonus) + ' · ' + p.pct + '%';
   $('qNum').textContent = S.qty;
   $('qMin').disabled = S.qty <= 1;
   $('qPlu').disabled = S.qty >= 3;
-  $('drTot').textContent = money(p.price * S.qty);
+  $('drTot').textContent = money(priceOf(p) * S.qty);
 }
 
 /* ================= ACCOUNT GATE ================= */
@@ -1064,10 +1134,11 @@ function showGateMsg(kind, txt){
   m.className = 'gate-msg ' + kind;
   var ic = kind === 'err'
     ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>';
+    : '<svg class="spin-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>';
   m.innerHTML = ic + '<span>' + txt + '</span>';
 }
 function hideGateMsg(){ $('gateMsg').hidden = true; }
+function setBusy(on){ $('accSpin').hidden = !on; }
 
 function renderPlayer(a){
   var pl = ACCOUNTS[a];
@@ -1077,9 +1148,7 @@ function renderPlayer(a){
   $('pcardHost').innerHTML =
     '<div class="pcard">' +
       '<div class="pcard-top">' +
-        '<div class="pav">' +
-          '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
-        '</div>' +
+        '<div class="pav"><img src="'+pl.av+'" alt="'+pl.name+'"></div>' +
         '<div class="pname-wrap">' +
           '<div class="pname">'+pl.name+'</div>' +
           '<div class="pid tnum">(Player ID: '+pl.pid+')</div>' +
@@ -1117,8 +1186,10 @@ function verifyAcc(){
   if(!v) return;
   showGateMsg('load', t('checking'));
   $('accBtn').disabled = true;
+  setBusy(true);
   setTimeout(function(){
     $('accBtn').disabled = false;
+    setBusy(false);
     if(ACCOUNTS[v]){
       renderPlayer(v);
     } else {
@@ -1159,14 +1230,25 @@ function openPay(){
   $('sPack').textContent = nf(S.pack.cp) + ' CP';
   $('sQty').textContent = '× ' + S.qty;
   $('sAcc').textContent = S.player.name;
-  $('sTot').textContent = money(S.pack.price * S.qty);
-  $('stepForm').hidden = false;
+  $('sTot').textContent = money(priceOf(S.pack) * S.qty);
+
+  /* 2s secure-checkout loader, then the form */
+  $('stepLoad').hidden = false;
+  $('stepForm').hidden = true;
   $('stepProc').hidden = true;
   $('stepFail').hidden = true;
   $('ovPay').classList.add('on');
   document.body.style.overflow = 'hidden';
+
+  clearTimeout(S.loadTimer);
+  S.loadTimer = setTimeout(function(){
+    if(!$('ovPay').classList.contains('on')) return;
+    $('stepLoad').hidden = true;
+    $('stepForm').hidden = false;
+  }, 2000);
 }
 function closePay(){
+  clearTimeout(S.loadTimer);
   $('ovPay').classList.remove('on');
   document.body.style.overflow = '';
 }
@@ -1180,7 +1262,7 @@ $('retry').addEventListener('click', function(){
   $('cNum').focus();
 });
 $('ovPay').addEventListener('click', function(e){
-  if(e.target === this && $('stepProc').hidden) closePay();
+  if(e.target === this && $('stepProc').hidden && $('stepLoad').hidden) closePay();
 });
 
 /* --- card input formatting --- */
@@ -1276,7 +1358,8 @@ function buildOrder(cardNum){
     id: 'CPS-' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '-' + Math.floor(100000 + Math.random()*899999),
     pack: p,
     qty: S.qty,
-    total: p.price * S.qty,
+    total: priceOf(p) * S.qty,
+    cur: lang,
     cp: p.cp * S.qty,
     base: p.base * S.qty,
     bonus: p.bonus * S.qty,
@@ -1298,7 +1381,7 @@ function runReveal(){
     b.innerHTML =
       '<div class="rvb-img"><img src="'+IMG+'" alt=""></div>' +
       '<b class="tnum">'+nf(o.pack.cp)+'</b>' +
-      '<small>'+nf(o.pack.base)+' + '+nf(o.pack.bonus)+' '+t('bonusW')+'</small>';
+      '<small>'+nf(o.pack.base)+' + '+nf(o.pack.bonus)+'</small>';
     host.appendChild(b);
   }
   $('rvTot').innerHTML = '<em class="tnum">' + nf(o.cp) + ' CP</em> · ' + t('total') + ' ' + money(o.total);
@@ -1351,7 +1434,7 @@ function renderReceipt(){
       '<div class="rcp-item-img"><img src="'+IMG+'" alt=""></div>' +
       '<div class="rcp-item-tx">' +
         '<b class="tnum">'+nf(o.pack.cp)+' CP</b>' +
-        '<small>'+nf(o.pack.base)+' + '+nf(o.pack.bonus)+' B · '+o.pack.pct+'% × '+o.qty+'</small>' +
+        '<small>'+nf(o.pack.base)+' + '+nf(o.pack.bonus)+' · '+o.pack.pct+'% × '+o.qty+'</small>' +
       '</div>' +
       '<div class="rcp-item-pr tnum">'+money(o.total)+'</div>' +
     '</div>';
@@ -1385,6 +1468,7 @@ function applyI18n(){
     if(v === undefined) return;
     if(k === 'heroT') el.innerHTML = v; else el.textContent = v;
   });
+  $('acc').placeholder = t('accPh');
   $('langTx').textContent = t('langLabel');
 }
 
@@ -1408,9 +1492,41 @@ $('langBtn').addEventListener('click', function(){
 /* ================= ESC ================= */
 document.addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
-  if($('ovPay').classList.contains('on') && $('stepProc').hidden) closePay();
+  if($('ovPay').classList.contains('on') && $('stepProc').hidden && $('stepLoad').hidden) closePay();
   else if($('drawer').classList.contains('on')) $('drX').click();
 });
+
+/* ========= IMAGE / ZOOM PROTECTION ========= */
+/* block right-click + long-press save on images */
+document.addEventListener('contextmenu', function(e){
+  if(e.target && e.target.tagName === 'IMG') e.preventDefault();
+});
+document.addEventListener('dragstart', function(e){
+  if(e.target && e.target.tagName === 'IMG') e.preventDefault();
+});
+
+/* block pinch-zoom gestures (iOS Safari ignores user-scalable=no) */
+document.addEventListener('gesturestart',  function(e){ e.preventDefault(); }, {passive:false});
+document.addEventListener('gesturechange', function(e){ e.preventDefault(); }, {passive:false});
+document.addEventListener('gestureend',    function(e){ e.preventDefault(); }, {passive:false});
+
+/* block multi-touch pinch */
+document.addEventListener('touchstart', function(e){
+  if(e.touches.length > 1) e.preventDefault();
+}, {passive:false});
+
+/* block double-tap zoom */
+var lastTap = 0;
+document.addEventListener('touchend', function(e){
+  var now = Date.now();
+  if(now - lastTap <= 300) e.preventDefault();
+  lastTap = now;
+}, {passive:false});
+
+/* block ctrl/cmd + wheel zoom on desktop */
+document.addEventListener('wheel', function(e){
+  if(e.ctrlKey || e.metaKey) e.preventDefault();
+}, {passive:false});
 
 /* ================= INIT ================= */
 renderGrid();
