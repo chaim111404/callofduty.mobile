@@ -16,6 +16,8 @@
 <link rel="preload" as="image" href="https://i.postimg.cc/LskvyQSx/IMG-1457.webp" fetchpriority="high">
 <link rel="preload" as="image" href="https://i.postimg.cc/bYR53Jgn/IMG-1463.png">
 <link rel="preload" as="image" href="https://i.postimg.cc/23R31wtc/IMG-1462.png">
+<link rel="preload" as="image" href="https://i.postimg.cc/YjKHqg87/IMG-1467-removebg-preview.png">
+<link rel="preload" as="image" href="https://i.postimg.cc/c4XhWZJk/IMG-1469-removebg-preview.png">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* ============ TOKENS ============ */
@@ -208,19 +210,17 @@ body.he .gate-lb{letter-spacing:0;text-transform:none;font-size:13.5px}
 .pname{font-family:var(--disp);font-size:23px;font-weight:700;letter-spacing:.03em;line-height:1.1;word-break:break-all}
 body.he .pname{font-family:var(--disp)}
 .pid{font-size:12.5px;color:var(--txt-mute);letter-spacing:.06em;margin-top:2px;font-weight:600}
-.pverify{
-  flex:none;display:flex;align-items:center;gap:5px;
-  background:rgba(34,197,94,.13);border:1px solid rgba(34,197,94,.3);
-  border-radius:100px;padding:5px 11px;
-  color:var(--grn);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-}
-body.he .pverify{letter-spacing:0;text-transform:none;font-size:12px}
 .pstats{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding-top:14px}
 .pstat{display:flex;align-items:center;gap:11px}
 .pstat-ic{
-  width:38px;height:38px;flex:none;border-radius:10px;
-  background:rgba(168,85,247,.11);border:1px solid rgba(168,85,247,.24);
-  display:grid;place-items:center;
+  width:38px;height:38px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:0;
+}
+.pstat-ic img{
+  width:30px;height:30px;                /* slightly smaller than the box */
+  max-width:100%;max-height:100%;
+  object-fit:contain;
 }
 .pstat-tx{min-width:0}
 .pstat-tx small{
@@ -313,18 +313,10 @@ body.he .spec-2{letter-spacing:0;text-transform:none;font-size:13px}
 .price-row{
   position:relative;z-index:1;
   margin-top:14px;padding-top:13px;border-top:1px solid var(--line);
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  display:flex;align-items:center;justify-content:center;
 }
 .price{font-family:var(--disp);font-size:25px;font-weight:700;letter-spacing:.01em;direction:ltr;color:var(--yel)}
 .price .cur{font-size:16px;color:var(--yel);margin-inline-start:2px}
-.pick{
-  display:flex;align-items:center;gap:6px;
-  border:1px solid var(--line-2);border-radius:9px;
-  padding:9px 14px;font-size:12.5px;font-weight:700;letter-spacing:.07em;
-  text-transform:uppercase;transition:.22s var(--ease);
-}
-body.he .pick{letter-spacing:0;text-transform:none;font-size:13.5px}
-.card:hover .pick,.card.sel .pick{background:var(--pur);border-color:var(--pur);color:#fff}
 
 /* ============ SELECTION DRAWER ============ */
 .drawer{
@@ -625,7 +617,6 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
   .spec-1{font-size:14px}
   .spec-2{font-size:11px}
   .price{font-size:20px}
-  .pick{padding:8px 11px;font-size:11px}
   .pstats{grid-template-columns:1fr}
   .dr{flex-wrap:wrap;gap:12px;padding:14px 0}
   .dr-img{width:44px;height:44px}
@@ -794,12 +785,8 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
             <circle class="ring" cx="50" cy="50" r="44"/>
             <circle class="arc" cx="50" cy="50" r="44"/>
           </svg>
-          <div class="spin-ic">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
         </div>
         <h4 data-i="loadT">Loading secure checkout</h4>
-        <p data-i="loadP">Establishing encrypted connection…</p>
       </div>
     </div>
 
@@ -933,6 +920,8 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
 
 /* ================= DATA ================= */
 var IMG = 'https://i.postimg.cc/qvPZDC3g/IMG-1456-removebg-preview.png';
+var IC_LEVEL = 'https://i.postimg.cc/YjKHqg87/IMG-1467-removebg-preview.png';
+var IC_RANK  = 'https://i.postimg.cc/c4XhWZJk/IMG-1469-removebg-preview.png';
 
 /* ils = price shown in Hebrew (₪) · inr = price shown in English (₹) */
 var PACKS = [
@@ -968,7 +957,7 @@ var T = {
     sumPack:'Package', sumQty:'Quantity', sumAcc:'Account',
     fCard:'Card number', fName:'Name on card', fExp:'Expiry', fCvv:'CVV',
     hintOk:'Approved:', hintNo:'Declined:', payNow:'Pay now',
-    loadT:'Loading secure checkout', loadP:'Establishing encrypted connection…',
+    loadT:'Loading secure checkout',
     accPh:'Enter ID',
     procT:'Processing payment',
     failT:'Transaction declined',
@@ -985,7 +974,6 @@ var T = {
     ftLegal:'Legal', ftTerms:'Terms', ftPrivacy:'Privacy', ftDemo:'Demo notice',
     ftCopy:'© 2026 CP Store — Demo build. Not affiliated with Activision. No real transactions are processed.',
     /* dynamic */
-    select:'Select',
     webBonus:'WEB BONUS', bonusW:'Bonus',
     lvlLb:'Level', rankLb:'MP Rank', verified:'Verified',
     checking:'Checking account…',
@@ -1006,7 +994,7 @@ var T = {
     sumPack:'חבילה', sumQty:'כמות', sumAcc:'חשבון',
     fCard:'מספר כרטיס', fName:'שם בעל הכרטיס', fExp:'תוקף', fCvv:'CVV',
     hintOk:'מאושר:', hintNo:'נדחה:', payNow:'שלם עכשיו',
-    loadT:'טוען עמוד תשלום מאובטח', loadP:'מוציב חיבור מוצפן…',
+    loadT:'טוען עמוד תשלום מאובטח',
     accPh:'הזן מזהה שחקן',
     procT:'מעבד תשלום',
     failT:'העסקה נדחתה',
@@ -1022,7 +1010,6 @@ var T = {
     ftStore:'החנות', ftPacks:'כל החבילות', ftBonus:'שיעורי בונוס', ftSupport:'תמיכה',
     ftLegal:'מידע משפטי', ftTerms:'תנאי שימוש', ftPrivacy:'פרטיות', ftDemo:'הבהרת הדגמה',
     ftCopy:'© 2026 CP Store — גרסת הדגמה. ללא שיוך ל-Activision. לא מתבצעות עסקאות אמיתיות.',
-    select:'בחירה',
     webBonus:'בונוס אתר', bonusW:'בונוס',
     lvlLb:'רמה', rankLb:'דירוג MP', verified:'מאומת',
     checking:'בודק חשבון…',
@@ -1079,10 +1066,6 @@ function renderGrid(){
       '</div>' +
       '<div class="price-row">' +
         '<div class="price tnum">'+pp.num+'<span class="cur">'+pp.sym+'</span></div>' +
-        '<div class="pick">' +
-          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
-          t('select') +
-        '</div>' +
       '</div>';
     el.addEventListener('click', function(){ pickPack(i, el); });
     el.addEventListener('keydown', function(e){
@@ -1157,18 +1140,14 @@ function renderPlayer(a){
           '<div class="pname">'+pl.name+'</div>' +
           '<div class="pid tnum">(Player ID: '+pl.pid+')</div>' +
         '</div>' +
-        '<div class="pverify">' +
-          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
-          t('verified') +
-        '</div>' +
       '</div>' +
       '<div class="pstats">' +
         '<div class="pstat">' +
-          '<div class="pstat-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3 1.2-6.8-5-4.9 6.9-1z"/></svg></div>' +
+          '<div class="pstat-ic"><img src="'+IC_LEVEL+'" alt=""></div>' +
           '<div class="pstat-tx"><small>'+t('lvlLb')+'</small><b class="tnum">'+pl.lvl+'</b></div>' +
         '</div>' +
         '<div class="pstat">' +
-          '<div class="pstat-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7a6 6 0 0 1-12 0z"/><path d="M6 4H3a2 2 0 0 0 0 4h3M18 4h3a2 2 0 0 1 0 4h-3M9 21h6M12 15v6"/></svg></div>' +
+          '<div class="pstat-ic"><img src="'+IC_RANK+'" alt=""></div>' +
           '<div class="pstat-tx"><small>'+t('rankLb')+'</small><b class="rank">'+pl.rank+'</b></div>' +
         '</div>' +
       '</div>' +
@@ -1505,6 +1484,8 @@ document.addEventListener('keydown', function(e){
    (player avatars in particular were visibly loading on verify). */
 var MEDIA = [
   IMG,
+  IC_LEVEL,
+  IC_RANK,
   'https://i.postimg.cc/LskvyQSx/IMG-1457.webp'   /* logo */
 ];
 for(var k in ACCOUNTS){ if(ACCOUNTS[k].av) MEDIA.push(ACCOUNTS[k].av); }
