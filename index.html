@@ -379,13 +379,6 @@ body.he .md-hd h3{font-family:var(--he);font-weight:900;letter-spacing:0;text-tr
 .md-x{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--txt-mute);transition:.18s;flex:none}
 .md-x:hover{background:var(--panel-2);color:var(--txt)}
 
-.warn{
-  display:flex;gap:11px;align-items:flex-start;
-  background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.3);
-  border-radius:11px;padding:13px;margin-bottom:18px;
-}
-.warn svg{flex:none;margin-top:1px}
-.warn p{font-size:12.5px;line-height:1.55;color:#fcd9a0;font-weight:600}
 
 .sum{background:#08080d;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:18px}
 .sum-l{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13.5px;padding:5px 0;color:var(--txt-dim);font-weight:600}
@@ -405,9 +398,6 @@ body.he .fl label{letter-spacing:0;text-transform:none;font-size:12.5px}
 .fl input:focus{border-color:var(--pur);box-shadow:0 0 0 4px rgba(168,85,247,.12);outline:none}
 .fl input::placeholder{color:var(--txt-mute);letter-spacing:.02em}
 .fl-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.hint{font-size:11px;color:var(--txt-mute);margin-top:6px;line-height:1.5;direction:ltr;text-align:left}
-body.he .hint{direction:rtl;text-align:right}
-.hint code{color:var(--pur-2);font-weight:700;letter-spacing:.06em}
 .btn-full{
   width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
   background:linear-gradient(135deg,var(--pur),var(--pur-deep));
@@ -792,11 +782,6 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
 
     <!-- STEP: FORM -->
     <div id="stepForm">
-      <div class="warn">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <p data-i="payWarn">This is a demo. No payment is processed and nothing is charged. Never enter a real card number here — use the test cards below.</p>
-      </div>
-
       <div class="sum">
         <div class="sum-l"><span data-i="sumPack">Package</span><b id="sPack"></b></div>
         <div class="sum-l"><span data-i="sumQty">Quantity</span><b id="sQty"></b></div>
@@ -807,7 +792,6 @@ body.he .ft-col h5{letter-spacing:0;text-transform:none;font-size:13px}
       <div class="fl">
         <label data-i="fCard">Card number</label>
         <input id="cNum" inputmode="numeric" autocomplete="off" placeholder="0000 0000 0000 0000" maxlength="19">
-        <p class="hint"><span data-i="hintOk">Approved:</span> <code>4580 1234 5678 9012</code> &nbsp;·&nbsp; <span data-i="hintNo">Declined:</span> <code>5357 1234 5678 9012</code></p>
       </div>
       <div class="fl">
         <label data-i="fName">Name on card</label>
