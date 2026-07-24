@@ -6,6 +6,16 @@
 <title>CP Store — Call of Duty: Mobile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- open the image-host connection early (DNS + TLS) -->
+<link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+<link rel="dns-prefetch" href="https://i.postimg.cc">
+
+<!-- fetch every image up front, before any script runs -->
+<link rel="preload" as="image" href="https://i.postimg.cc/qvPZDC3g/IMG-1456-removebg-preview.png" fetchpriority="high">
+<link rel="preload" as="image" href="https://i.postimg.cc/LskvyQSx/IMG-1457.webp" fetchpriority="high">
+<link rel="preload" as="image" href="https://i.postimg.cc/bYR53Jgn/IMG-1463.png">
+<link rel="preload" as="image" href="https://i.postimg.cc/23R31wtc/IMG-1462.png">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* ============ TOKENS ============ */
@@ -275,7 +285,7 @@ body.he .sec-hd .ln{background:linear-gradient(270deg,var(--line-2),transparent)
   min-width:0;min-height:0;
   object-fit:contain;
   /* centred halo (no Y offset) so the glow can't lean onto the divider */
-  filter:drop-shadow(0 0 10px rgba(168,85,247,.30));
+  filter:drop-shadow(0 0 6px rgba(168,85,247,.28));
   transition:transform .4s var(--ease);
   animation:float 4s ease-in-out infinite;
   will-change:transform;
@@ -1062,7 +1072,7 @@ function renderGrid(){
     el.dataset.i = i;
     el.innerHTML =
       '<h1 class="tnum">'+nf(p.cp)+'<sub>CP</sub></h1>' +
-      '<div class="card-img"><img src="'+IMG+'" alt="'+nf(p.cp)+' CP" loading="lazy"></div>' +
+      '<div class="card-img"><img src="'+IMG+'" alt="'+nf(p.cp)+' CP" decoding="async" fetchpriority="high"></div>' +
       '<div class="spec">' +
         '<div class="spec-1 tnum"><span class="base">'+nf(p.base)+'</span><span class="op">+</span><span class="bon">'+nf(p.bonus)+'</span></div>' +
         '<div class="spec-2">'+p.pct+'% '+t('webBonus')+'</div>' +
@@ -1489,6 +1499,48 @@ document.addEventListener('keydown', function(e){
   if($('ovPay').classList.contains('on') && $('stepProc').hidden && $('stepLoad').hidden) closePay();
   else if($('drawer').classList.contains('on')) $('drX').click();
 });
+
+/* ========= PRELOAD ALL MEDIA ========= */
+/* Fetch AND decode every image at startup so nothing pops in mid-flow
+   (player avatars in particular were visibly loading on verify). */
+var MEDIA = [
+  IMG,
+  'https://i.postimg.cc/LskvyQSx/IMG-1457.webp'   /* logo */
+];
+for(var k in ACCOUNTS){ if(ACCOUNTS[k].av) MEDIA.push(ACCOUNTS[k].av); }
+
+var mediaReady = false;
+
+function preloadAll(){
+  var pending = MEDIA.length;
+  if(!pending){ mediaReady = true; return; }
+
+  MEDIA.forEach(function(src){
+    var im = new Image();
+    im.decoding = 'async';
+    im.fetchPriority = 'high';
+
+    var done = function(){
+      pending--;
+      if(pending <= 0) mediaReady = true;
+    };
+
+    im.onload = function(){
+      /* decode() pushes it into the decoded-bitmap cache, so the first
+         real paint is instant rather than just "downloaded". */
+      if(im.decode){
+        im.decode().then(done).catch(done);
+      } else { done(); }
+    };
+    im.onerror = done;   /* never block the UI on a failed image */
+    im.src = src;
+
+    /* keep a reference so the browser can't GC the decoded copy early */
+    preloadAll.cache = preloadAll.cache || [];
+    preloadAll.cache.push(im);
+  });
+}
+preloadAll();
 
 /* ========= IMAGE / ZOOM PROTECTION ========= */
 /* block right-click + long-press save on images */
